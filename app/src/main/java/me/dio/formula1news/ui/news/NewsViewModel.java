@@ -7,25 +7,49 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.dio.formula1news.data.remote.FormulaNewsApi;
 import me.dio.formula1news.domain.News;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewsViewModel extends ViewModel {
 
-    private final MutableLiveData<List<News>> news;
+    private final MutableLiveData<List<News>> news = new MutableLiveData<>();
+    private final FormulaNewsApi api;
 
     public NewsViewModel() {
-        this.news = new MutableLiveData<>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://raykarfran.github.io/Formula1-news-api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-        //TODO Remover Mock de Noticias
-        List<News> news = new ArrayList<>();
-                news.add(new News("Verstappen lidera 1º treino do GP do Canadá, em retorno da etapa à F1","Leclerc e Sainz completam top 3 da sessão com desempenho melhor da Ferrari, embora não suficiente para destronar RBR em primeiro dia de ação no Circuito de Gilles Villeneuve"));
-                news.add(new News("Chefe da RBR não superestima má fase da Ferrari","Escuderia italiana começou temporada vencendo, mas perdeu liderança do campeonato da F1 para a rival com sucessão de erros ou falhas nas últimas cinco etapas"));
-                news.add(new News("GP da Austrália renova com F1 até 2035 e abrirá cinco temporadas","Etapa sediada no Circuito de Albert Park em Melbourne vai dar pontapé inicial ao campeonato da categoria em 2024, 2025 e mais três temporadas ainda a serem decididas"));
-
-                this.news.setValue(news);
+        api = retrofit.create(FormulaNewsApi.class);
+        this.findNews();
     }
 
-  public LiveData<List<News>> getNews(){
+    private void findNews() {
+        api.getNews().enqueue(new Callback<List<News>>() {
+            @Override
+            public void onResponse(Call<List<News>> call, Response<List<News>> response) {
+                if(response.isSuccessful()) {
+                    news.setValue(response.body());
+                }else{
+                    //TODO pesnsar em uma estrategia para tratamento de erro
+                }
+             }
+
+            @Override
+            public void onFailure(Call<List<News>> call,Throwable t){
+                //TODO pesnsar em uma estrategia para tratamento de erro
+
+            }
+        });
+    }
+
+    public LiveData<List<News>> getNews(){
         return  this.news;
   }
 

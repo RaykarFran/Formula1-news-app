@@ -3,11 +3,8 @@ package me.dio.formula1news.domain;
 public class News {
     private String title;
     private String descripion;
-
-    public News(String title, String descripion) {
-        this.title = title;
-        this.descripion = descripion;
-    }
+    private String image;
+    private String link;
 
     public String getTitle() {
         return title;
@@ -23,5 +20,21 @@ public class News {
 
     public void setDescripion(String descripion) {
         this.descripion = descripion;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }
